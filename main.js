@@ -7,7 +7,6 @@ let underLine =  document.getElementById("under-line");
 let taskTabs = document.querySelectorAll(".task-tabs div");
 let mode = "all";
 let filterList = [];
-let result = false;
 
 taskTabs.forEach(status=>status.addEventListener("click", (e)=>taskTabIndicator(e)));
 
@@ -28,8 +27,8 @@ function addTask(){
         isComplete : false
     }
     taskList.push(task);
+    filterList.push(task);
     render();
-    console.log(taskList);
 }
 
 // 투두 리스트 그려주기 (렌더링)
@@ -56,7 +55,7 @@ function render() {
       </div>
       `;
     // 진행중인 투두의 경우
-    } else {
+    } else if (!list[i].isComplete) {
       resultHTML += `
       <div class="task">
           <div>${list[i].taskContent}          
@@ -87,25 +86,25 @@ function toggleComplete(id) {
 
 // 특정 투두 삭제
 function deleteTask(id) {    
-    result = confirm("정말 삭제하시겠습니까?");
-    if (result == true) {
-      list = [];
-      if (mode == "all") {
-        list = taskList;
-      } else {
-        list = filterList;
-      }
-
-      for (let i = 0; i < list.length; i++) {
-          if (list[i].id == id) {
-              list.splice(i,1);
-              list = filterList;
+  let deleteOk = confirm("정말 삭제하시겠습니까?");
+  if (deleteOk) {
+      for (let i = 0; i < taskList.length; i++) {
+          if (taskList[i].id == id) {
+              taskList.splice(i,1);
+            
               break; //찾았으면 중간에라도 나오는거 잊지 말기!!
           }
       }
+      // 필터링된 화면일 때도 바로 적용되게
+      for (let i = 0; i < filterList.length; i++) {
+        if (filterList[i].id == id) {
+            filterList.splice(i,1);
+            break; 
+        }
+      }
       render();
     } 
-}
+  }
 
 // 아이템 아이디 값으로 줄 랜덤 문자 생성
 function randomIDGenerate(){
